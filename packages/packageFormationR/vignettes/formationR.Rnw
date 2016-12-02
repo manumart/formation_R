@@ -1,0 +1,16 @@
+\documentclass[a4paper]{article}
+\usepackage{Sweave}
+\begin{document}
+\title{Exemple d'utilisation de Sweave}
+\author{R4CIAM\\ INRA, Applied Mathematics
+  and Informatics Unit \\ 78352 Jouy-en-Josas Cedex\\ France}
+\date{January 2011}
+\maketitle
+\section{Exemple avec graphiques}
+Voici un exemple simple:
+<< exemple, echo=FALSE, fig=TRUE, width=10, height=4 >>=
+par(mfrow=c(1,2))
+hist(rnorm(100), main="")
+hist(rnorm(1000), main="")
+@
+\end{document}

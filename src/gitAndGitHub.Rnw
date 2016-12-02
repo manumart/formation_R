@@ -1,0 +1,474 @@
+%\documentclass{beamer} %
+\documentclass[12pt,handout]{beamer}
+\usetheme{CambridgeUS}
+\usepackage[utf8]{inputenc}
+\usefonttheme{professionalfonts}
+\usepackage{times}
+\usepackage{tikz}
+\usepackage{amsmath}
+\usepackage{verbatim}
+\usepackage{hyperref}
+\usepackage{yfonts,color}
+\usetikzlibrary{arrows,shapes}
+\defbeamertemplate{itemize item}{tikzarrow}{\tikz{\node[single
+arrow,scale=0.2,inner sep=2ex,fill] at (0,0) {};}}
+
+
+\author{Manuel Martin Infosol}
+\title{R, quelque part entre enfer et paradis}
+
+
+\begin{document}
+
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+%-------------------------------------
+
+\begin{frame}
+\yinipar{\color{red}S}i vous utilisez R, et que vous avez l'impression d'être en enfer, ce livre vous servira de guide (Burns statistics, 2011)\\
+\begin{figure}
+	\centering
+	\includegraphics[width=0.3\linewidth]{/home/manuel/manu/communiquer/cours/theRInferno/coverRInferno/cover.png}
+\end{figure}
+\href{http://www.burns-stat.com/documents/books/the-r-inferno/}{http://www.burns-stat.com/documents/books/the-r-inferno/}
+
+\end{frame}
+
+
+
+
+%-------------------------------------
+
+\begin{frame}{Introduction}
+
+-> R est un langage extrêmement puissant et convivial, qui vise le double objectif d'être interactif (console, langage interprété) et d'être utilisé également de façon intensive pour la programmation. Cela cause une tension et certaines fonctions ont des arrangements secrets qu'il peut être bon de connaître.\\
+\vspace{0.2 cm}
+-> Il est parfois possible de faire la même chose de plusieurs façons différentes, notamment pour des besoins de compatibilité ascendante.\\
+\vspace{0.2 cm}
+
+-> L'utilisateur débutant deviendra vite un programmateur, voici quelques exemples et mises en garde qui, je l'espère, vous seront utiles\dots
+
+
+\end{frame}
+
+
+%%% --------------------------------
+\section{Les flottants}
+
+\begin{frame}[fragile]{Nombres à virgule flottante}
+L'écriture des nombres (hors entier) se fait à l'aide d'un triplet, \textit{i.e.} $s.m.b^e$ \\
+
+$s$ = signe ; $m$ = mantisse; $b$ = la base de la représentation; $e$ = exposant
+
+\vspace{0.7 cm}
+Par exemple pour le nombre -1.3254, 
+$s$ = - ; $m$ = 13254; $b$ = 10; $e$ = -4
+
+\vspace{0.7 cm}
+R, permet la représentation de 16 chiffres décimaux.
+<<>>=
+12345678912345679 == 12345678912345670
+123456789123456789 == 123456789123456780
+@
+\end{frame}
+
+
+\begin{frame}[fragile]
+
+L'utilisateur de R pense généralement que 
+ \texttt{
+    .1 == .3 / 3
+} \\
+est vrai.
+\vspace{1 cm}
+
+Il pense également que 
+ \texttt{ 
+seq(0, 1, by=.1) == .3
+ } \\
+comporte un élément vrai,
+
+\vspace{1 cm}
+mais ne pense généralement pas que \\
+ \texttt{ 
+unique(c(.3, .4 - .1, .5 - .2, .6 - .3, .7 - .4))
+ } \\
+est de longueur un.
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Or}
+
+<<>>=
+ .1 == .3 / 3
+ seq(0, 0.5, by=.1) == .3
+ unique(c(.3, .4 - .1, .5 - .2, .6 - .3, .7 - .4))
+@
+
+\end{frame}
+
+
+\begin{frame}[fragile]
+Une autre croyance répandue chez les utilisateurs de R : ce qui appara\^it à l'écran est tout ce qu'il y a. 
+<<>>=
+ 7/13 - 3/31
+@
+
+R imprime -par défaut-, une version raccourcie, et non pas tout son savoir à propos des chiffres\dots :
+<<>>=
+ print(7/13 - 3/31, digits=16)
+@
+
+<<echo = FALSE>>=
+ x <- 0.2348 + rnorm(200)/ 1e04
+@
+Les functions \texttt{summary()} sont même souvent encore plus restrictives sur ce qu'elles impriment :
+<<>>=
+ summary(x)
+@
+\end{frame}
+
+%%%%%%%%%%%
+
+\begin{frame}[fragile]{Or}
+<<fig = TRUE,height=4,width=6>>=
+plot(x)
+@
+\end{frame}
+
+%-----------------------------------------
+
+\section{Les pertes de mémoire pour les gros objets}
+\begin{frame}[fragile]{Les gourmands}
+
+<<>>=
+ n <- 1e4
+ vec <- numeric(0)
+ for(i in 1:n) 
+	vec <- c(vec, i)
+@
+
+et
+
+<<>>=
+ n <- 1e4
+ vec <- numeric(n)
+ for(i in 1:n) 
+	vec[i] <- i
+@
+
+Comparer les temps d'execution\dots
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]{Des problèmes de mémoire?}
+
+Lorsque vous utilisez trop de mémoire, R risque de se plaindre. R charge toutes les données en mémoire vive (RAM). Cela peut être une limitation lorsque l'on travaille avec des jeux de donnée de grande dimension. L'avantage est la flexibilité (il n'y a pas de contrainte sur la forme des données et la vitesse d'accès. \\
+\vspace{1 cm}
+Un message d'erreur avec lequel vous demviendrez sans doute familliers \\ \texttt{ 
+Error: cannot allocate vector of size 79.8 Mb.
+ }
+
+\end{frame}
+
+
+\begin{frame}[fragile]{Vectoriser}
+
+<<>>>=
+
+x <- 1:20
+lsum <- 0
+for(i in 1:length(x)) {
+  lsum <- lsum + log(x[i])
+}
+@
+
+Non, Non, Non. Utilisez plutôt : 
+<<>>=
+lsum <- sum(log(x))
+@
+
+Cela marche gr\^ace à la vectorisation dans R : plus rapide et plus élégant. Beaucoup d'autres fonctions sont vectorisées (max, min, les fonctions mathématiques, etc.).
+
+
+\end{frame}
+
+
+%----------------------------
+\section{(ne pas toujours) Croire que R fait ce qu'on lui demande}
+%\subsection{Precedence}
+
+%----------------------------
+
+\begin{frame}[fragile]{Priorité et associativité}
+
+\begin{itemize}
+
+\item<1->
+\texttt{x<-3} indique-t-il un test d'inégalité?
+
+\item<2->
+\texttt{
+m <- 5
+1:m-1
+}
+<<>>=
+m <- 5
+1:m-1
+@
+
+
+\item<3->
+\texttt{
+-2.3 \^ 4.5
+x <- -2.3
+x \^ 4.5
+}
+
+\item<4->
+\texttt{
+?Syntax
+}
+
+\end{itemize}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]{Détecter la présence de valeurs}
+
+Pour détecter la présence de valeurs manquantes on ne peut pas faire : \\
+\texttt{x == NA} 
+\begin{itemize}
+
+\vspace{1 cm}
+
+\item<1-> 
+Pourquoi? \\
+\vspace{1 cm}
+
+\item
+Un indice:
+<<eval=FALSE, echo=TRUE>>=
+ 3 == c(3, 1, 3, NA) 
+@ 
+\vspace{1 cm}
+
+\item
+Utiliser plutôt 
+	 \texttt{is.na(x) }
+
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[fragile]{Tester la présence de nuls}
+
+<<>>=
+xnull <- NULL
+xnull == NULL
+xnotnull <- 42
+xnotnull == NULL
+is.null(xnull)
+@
+
+\end{frame}
+
+%-------------------------
+\begin{frame}[fragile]{Appartenance}
+Ne pas utiliser le '\texttt{==}' pour l'appatenance à des vecteurs.
+\vspace{1 cm}
+<<>>=
+x1 <- 3:7
+x1 == c(4, 6)
+@
+
+\vspace{1 cm}
+Utiliser \texttt{\%in\%} a la place
+<<>>=
+x1 %in% c(4, 6)
+@
+
+\end{frame}
+
+%------------------------------------
+\begin{frame}[fragile]{Matches et w(h)itches}
+
+\texttt{match()} ne renvoit que les premières occurences
+<<>>= 
+match(1:2, rep(1:4, 2))
+@ 
+
+Si l'on souhaite obtenir toutes les occurences, il faut utiliser \texttt{which()}.
+<<>>= 
+which(rep(1:4, 2) %in% 1:2) 
+@
+\end{frame}
+
+
+%-------------------------
+\begin{frame}[fragile]{Coercion}
+
+\begin{alertblock}{Coercion}
+Conversion d'un objet d'un type donné en un objet d'un autre type. Dans R, les types élémentaires sont \texttt{ logical, integer, numeric, complex} et \texttt{character}
+	\end{alertblock}
+
+\vspace{0.5 cm}
+Est-ce que \texttt{3 == TRUE} est vrai? Et \texttt{-3 == TRUE} 
+
+\end{frame}
+
+\begin{frame}[fragile]{Coercion}
+
+<<>>=
+3 == TRUE
+-3 == TRUE
+@
+
+\end{frame}
+
+%-------------------------
+\begin{frame}[fragile]{Précédence et coercion}
+<<>>=
+x1
+@
+
+Que donnent : \\
+\texttt{x1 == 4 | 6} ?? \\
+\vspace{0.5 cm} et 
+\texttt{x1 == (4 | 6)}
+\vspace{0.5 cm}
+
+\uncover<2>{
+\begin{alertblock}{Solution}
+Décomposer le test multiple ou utiliser \texttt{\%in\%} \\
+
+\vspace{0.2 cm}
+\texttt{x1 == 4 | x1 == 6} \bf{ou} \texttt{x1 \%in\% c(4, 6)}
+
+	\end{alertblock}
+}
+
+\end{frame}
+
+%-------------------------
+\begin{frame}[fragile]{Negative nothing is something}
+ Possibilité d'utiliser which pour connaître la position d'un élément dans un vecteur : 
+
+<<>>=
+	which(x1 == 3)
+	x1[-2]
+@
+
+Donc 
+
+<<>>=
+	x1[-which(x1 == 3)]
+@
+
+\vspace{0.5 cm}
+
+Par conséquent, que vaut  \\
+\texttt{x1[-which(x1 == 5)]} ??
+
+\end{frame}
+
+
+
+%-------------------------
+\begin{frame}[fragile]{Something plus nothing is nothing}
+
+<<>>=
+ 1 + NULL
+@
+\vspace{1 cm}
+
+\uncover
+S'explique par le phénomène de recyclage dans R, qui implique que le résultat de la somme d'un entier et d'un vecteur a la longueur du vecteur. Mais \dots 
+\end{frame}
+
+
+%-------------------------
+\begin{frame}[fragile]{Something plus nothing is nothing}
+
+Et d'ailleurs
+<<>>=
+1 + numeric(0)
+1 + numeric(2)
+1 + numeric(4)
+1 + numeric(4) + numeric(0)
+1 + numeric(4) + numeric(2)
+1 + numeric(4) + numeric(5)
+@
+
+\end{frame}
+
+%-------------------------
+\begin{frame}[fragile]{But zero can be something}
+<<>>=
+x3 <- 1:3
+x3[c(0, 4)] <- c(-1, 9)
+x3
+@
+\texttt{Warning message:\\
+In x3[c(0, 4)] <- c(-1, 9) :\\
+  number of items to replace is not a multiple of replacement length}
+\begin{alertblock}{\texttt{warnings}}
+De façon générale, il faut faire attention aux warnings, qui indiquent que quelque chose ne s'est pas déroulé comme prévu\dots
+\end{alertblock}
+\end{frame}
+
+
+%-------------------------
+\begin{frame}[fragile]{Sum of nothing is zero but product of nothing is one}
+<<>>=
+	sum(numeric(0))
+	prod(numeric(0))
+@
+
+\end{frame}
+
+%-------------------------
+\section{conclusion}
+
+\begin{frame}[fragile]{Conclusion}
+\setbeamertemplate{itemize item}[tikzarrow]
+
+\begin{itemize}
+\item Vectoriser
+\item Attention à la coercion silencieuse
+\item Dans la mesure du possible, anticiper la taille des objets manipulés
+\item Attention à la manipulation des \texttt{NAs} et des \texttt{NULL}
+\item Toujours traiter les \texttt{warnings} avec soin
+\end{itemize}
+
+\end{frame}
+
+
+%-------------------------
+\begin{frame}[fragile]
+
+Merci de Votre attention et rendez-vous au paradis!!!!
+
+\begin{figure}
+
+  \includegraphics[width=0.6\linewidth]{/home/manuel/manu/communiquer/cours/theRInferno/coverRInferno/cranach.jpg}
+\end{figure}
+
+\end{frame}
+
+
+
+
+\end{document}
+
+
+
+
