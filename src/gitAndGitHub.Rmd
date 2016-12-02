@@ -1,0 +1,274 @@
+---
+title: "Code optimization"
+author: "Formation R avancé. INRA."
+date: "Decembre 2016."
+knit: (function(inputFile, encoding) { 
+        rmarkdown::render(
+          inputFile,
+          encoding = encoding, 
+          output_dir = "../Day2",
+          output_format = "beamer_presentation"
+        ) 
+      })
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# Loops and vectorized operations
+
+## Computing a likelihood
+
+A likelihood often involves terms such as $\log(\prod_{i=1}^n x_i)$ for the vector of observations $\mathbf x$.
+
+However, for numerical accuracy it is more convenient to compute $\sum_i \log(x_i)$ instead.
+
+- Take 
+    ```{r long-vector}
+    x <- runif(1e5)
+    ```
+
+    and compute $\sum_i \log(x_i)$
+    
+## sum-log alternative functions
+    
+```{r sum-log-alternatives}
+funs <- list(
+  loop = function(x) {
+    slx <- 0
+    for( i in seq_along(x) ) {
+      slx <- slx + log(x[i])
+    }
+  },
+  vectorized = function(x) sum(log(x))
+)
+
+
+```
+
+## sum-log benchmarks
+
+```{r sum-log-times}
+time_f <- function(f, x) system.time(f(x))
+sapply(funs, time_f, x)
+```
+
+
+## Take-away message
+
+- Here, `log()` is a *vectorized function* (i.e. `log(vec) = vec(logs)`)
+
+Rather than looping, \alert{exploit vectorized operations} as much as you can
+
+(see Programming - [Vectorized Operations](../support/Programming.html#vectorized-operations))
+
+
+## Growing computations
+
+- Compute the squares of the first $N$ integers
+
+
+## Growing alternative functions
+
+```{r growing-alternative-functions}
+funs <- list(
+  grow_vec = function(n) {
+    a <- NULL
+    for(i in 1:n) a <- c(a, i^2)
+    a},
+  preal_vec = function(n) {
+    a <- numeric(n)
+    for(i in 1:n) a[i] <- i^2
+    a},
+  vectorized = function(n) {
+    a <- (1:n)^2
+    a}
+)
+
+```
+
+
+## Growing benchmarks
+
+```{r growing-benchmarks}
+sapply(funs, time_f, x = 1e4)
+```
+
+
+## Take-away messages
+
+- Use \alert{vectorized} operations when possible (did I say that already?)
+
+- If you need/want a loop, \alert{preallocate} space, and minimize type
+conversion and function calls within the loop
+
+
+
+## Vectorizing with `*apply()`
+
+The `apply()` family of functions allows building a vectorized version of a
+non-vectorized functions
+
+- Given a matrix `x` such as
+
+```{r alternative-arithmetic-means}
+N <- 1e2
+x <- t( 1:N + matrix(rnorm(N^2), N) )
+```
+
+1. Can you understand what does the code do?
+
+2. Write a function to compute the row sums
+
+
+## Alternative functions for computing row-sums
+
+```{r alternative-functions-colmeans, warning=FALSE}
+funs <- list(
+  loop = function(x) {
+    # pre-allocate space and type
+    cm <- vector("double", length = nrow(x))
+    for (i in seq_len(nrow(x))) {
+      cm[i] <- mean(x[i, ])
+    }
+    return(cm)
+  },
+  apply = function(x) apply(x, 1, mean),
+  vectorized = function(x) rowMeans(x)
+)
+
+```
+
+
+## Comparison of performance with `system.time()`
+
+```{r performance-system-time}
+sapply(funs, time_f, x)  # too fast
+```
+
+- All alternatives are **too fast** to notice differences
+
+- Even if noticeable, results would be **noisy**
+
+- Idea: **repeat** each approach many times, and compare distributions
+
+
+## Comparison of performance with the `microbenchmark` package
+
+```{r performance-microbenchmark, fig.width = 4, fig.height = 2}
+library(microbenchmark); library(ggplot2)
+mb <- with(funs,
+           microbenchmark(loop(x), apply(x), vectorized(x)))
+autoplot(mb) + expand_limits(y=100)
+```
+
+
+
+## Take-away message
+
+- `*apply()` is not **necessarily** faster than `for` loops (althoug it often
+is)
+
+- Use native vectorized functions when possible (`rowSums()`, `colSums()`,
+`rowMeans()`, `colMeans()`)
+
+
+## Think vector
+
+> Vectorize your code
+
+- Avoid `for` loops (mainly for expressiveness)
+
+    - but if you use, then preallocate space
+
+- Master the `*apply()` family and/or the `plyr` package
+
+- Yet, prefer the most specialized (vectorized) function available (e.g. `row/colSums()`, `row/colMeans()`)
+
+- There are some specific situations where loops are more natural/convenient 
+    (See [Advanced R. \S 11.6](http://adv-r.had.co.nz/Functionals.html\#functionals-not))
+
+
+## Don't overoptimize
+
+- Unless you know in advance that performance will be a problem, focus on
+writing robust, reliable, clear and easy to maintain code
+
+- Optimize only \alert{if needed}, \alert{where needed}
+
+
+# Profiling
+
+
+## Find out *where* optimization is needed
+
+```{r profiling-example, eval = FALSE}
+library(profvis)
+profvis({
+  data(diamonds, package = "ggplot2")
+  
+  plot(price ~ carat, data = diamonds)
+  m <- lm(price ~ carat, data = diamonds)
+  abline(m, col = "red")
+})
+```
+
+
+## Further reading
+
+(see Programming - [Profiling](../support/Programming.html#profiling))
+
+
+
+# Compiled code
+
+
+- `compiler::cmpfun()` byte-compile R functions
+
+- `Rcpp::cppFunction()` write and compile C++ code from R on the fly
+
+
+
+## Compile example
+
+\small
+
+```{r compilers-example}
+sumR <- function(x) {
+  total <- 0
+  for (i in seq_along(x)) {
+    total <- total + x[i]
+  }
+  total}
+
+sum_bytec <- compiler::cmpfun(sumR)
+
+sumC <- Rcpp::cppFunction('double sumC(NumericVector x) {
+    int n = x.size(); double total = 0;
+    for(int i = 0; i < n; ++i) {
+      total += x[i];
+    }
+    return total;  }')
+
+sum_vec <- function(x) sum(x)
+```
+
+## Compilers benchmark
+
+```{r compilers-benchmark, fig.width = 4, fig.height = 2}
+library(microbenchmark); library(ggplot2)
+x <- runif(1e3)
+autoplot(
+    microbenchmark(sumR(x), sum_bytec(x), sumC(x), sum_vec(x))
+  )
+```
+
+## Further reading
+
+- see Programming
+    - [Byte code compilation](../support/Programming.html#byte-code-compilation-compilercmpfun)
+
+    - [Interfacing with C(++)](../support/Programming.html#interfacing-with-c-package-rcpp)
+
