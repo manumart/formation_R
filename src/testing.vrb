@@ -1,0 +1,8 @@
+\frametitle{\texttt {test-} files}
+A test file lives in `tests/testthat/`. Its name must start with `test`.
+
+
+\begin{itemize}
+\item The highest-level structure of tests is the file.
+\item Each file should contain a single `context()` call that provides a brief description of its contents.
+\end{itemize}
