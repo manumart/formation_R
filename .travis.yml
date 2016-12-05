@@ -5,3 +5,4 @@ sudo: false
 cache: packages
 before_install:
   - cd packages/packageFormationR
+  - Rscript -e 'install.packages("nlme", lib="/home/travis/R-bin/lib/R/library/")'
