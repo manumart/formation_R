@@ -1,0 +1,973 @@
+\documentclass[ignorenonframetext,]{beamer}
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{caption label separator}{:}
+\setbeamercolor{caption name}{fg=normal text.fg}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\usepackage{lmodern}
+\ifxetex
+  \usepackage{fontspec,xltxtra,xunicode}
+  \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \newcommand{\euro}{€}
+\else
+  \ifluatex
+    \usepackage{fontspec}
+    \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+    \newcommand{\euro}{€}
+  \else
+    \usepackage[T1]{fontenc}
+    \usepackage[utf8]{inputenc}
+      \fi
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{\usepackage{microtype}}{}
+\usepackage{longtable,booktabs}
+\usepackage{caption}
+% These lines are needed to make table captions work with longtable:
+\makeatletter
+\def\fnum@table{\tablename~\thetable}
+\makeatother
+\usepackage{url}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight0.8\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+
+% Comment these out if you don't want a slide with just the
+% part/section/subsection/subsubsection title:
+\AtBeginPart{
+  \let\insertpartnumber\relax
+  \let\partname\relax
+  \frame{\partpage}
+}
+\AtBeginSection{
+  \let\insertsectionnumber\relax
+  \let\sectionname\relax
+  \frame{\sectionpage}
+}
+\AtBeginSubsection{
+  \let\insertsubsectionnumber\relax
+  \let\subsectionname\relax
+  \frame{\subsectionpage}
+}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\setcounter{secnumdepth}{0}
+
+\date{}
+
+\begin{document}
+
+\begin{frame}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://git-scm.com/images/logos/downloads/Git-Logo-2Color.png}
+\caption{git}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Concepts de base}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Décentralisé
+\item
+  Rapide
+\item
+  Flexible
+\end{itemize}
+
+Note: Inspiré par BitKeeper et créé en 2005 pour le remplacer après que
+la gratuité de ce dernier soit révoqué.
+
+\end{frame}
+
+\begin{frame}{Décentralisé}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://git-scm.com/figures/18333fig0103-tn.png}
+\caption{schema decentralisé}
+\end{figure}
+
+(git, mercurial, bazaar, bitkeeper, darcs)
+
+\end{frame}
+
+\begin{frame}
+
+\begin{block}{Avantages}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Chaque \texttt{clone} est un \texttt{fork}
+\item
+  Chaque \texttt{clone} est un backup
+\item
+  Possibilité de versionner hors ligne
+\item
+  \textbf{Très} rapide
+\end{itemize}
+
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+
+\begin{block}{Inconvénients}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Pas très performant pour les gros fichiers binaires
+\end{itemize}
+
+Note: Chaque clone est un backup : a condition de maintenir a jour
+toutes les branches.
+
+\end{block}
+
+\end{frame}
+
+\begin{frame}{Objectif de git}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Rapidité
+\item
+  Simplicité
+\item
+  Prise en charge de milliers de branches parallèles
+\item
+  Architecture distribuée
+\item
+  Capable de gerer efficacement de gros projet \emph{(ex:Le noyau
+  Linux)}
+\item
+  Garantir l'intégrité
+\end{itemize}
+
+Note: + Git est rapide car presque toutes les opérations sont locale. +
+Git gère l'intégrité en utilisant des somme de contrôle (checksum ou
+hash) qui servent ensuite de référence.
+
+\end{frame}
+
+\begin{frame}{Les trois états}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://git-scm.com/figures/18333fig0106-tn.png}
+\caption{schema 3 states}
+\end{figure}
+
+Note: Cette notion est primordiale pour la compréhension de la suite.
+Git gère trois états dans lesquels les fichiers peuvent résider :
+validé, modifié et indexé.
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Validé signifie que les données sont stockées en sécurité dans votre
+  base de données locale.
+\item
+  Modifié signifie que vous avez modifié le fichier mais qu'il n'a pas
+  encore été validé en base.
+\item
+  Indexé signifie que vous avez marqué un fichier modifié dans sa
+  version actuelle pour qu'il fasse partie du prochain instantané du
+  projet.
+\end{itemize}
+
+Ceci nous mène aux trois sections principales d'un projet Git : le
+répertoire Git, le répertoire de travail et la zone d'index.
+
+\end{frame}
+
+\begin{frame}{Le dossier git}
+
+Note: Le répertoire Git est l'endroit où Git stocke les méta-données et
+la base de données des objets de votre projet. C'est la partie la plus
+importante de Git, et c'est ce qui est copié lorsque vous clonez un
+dépôt depuis un autre ordinateur.
+
+Le répertoire de travail est une extraction unique d'une version du
+projet. Ces fichiers sont extraits depuis la base de données compressée
+dans le répertoire Git et placés sur le disque pour pouvoir être
+utilisés ou modifiés.
+
+La zone d'index est un simple fichier, généralement situé dans le
+répertoire Git, qui stocke les informations concernant ce qui fera
+partie du prochain instantané.
+
+\end{frame}
+
+\begin{frame}{Utilisation standard}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://git-scm.com/figures/18333fig0201-tn.png}
+\caption{schema file lifecycle}
+\end{figure}
+
+\begin{enumerate}
+\def\labelenumi{\arabic{enumi}.}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Modifier des fichiers dans l'espace de travail
+\item
+  Indexer les fichiers modifiés
+\item
+  Valider les changements
+\end{enumerate}
+
+Note: L'utilisation standard de Git se passe comme suit :
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  vous modifiez des fichiers dans votre répertoire de travail ;
+\item
+  vous indexez les fichiers modifiés, ce qui ajoute des instantanés de
+  ces fichiers dans la zone d'index ;
+\item
+  vous validez, ce qui a pour effet de basculer les instantanés des
+  fichiers de l'index dans la base de données du répertoire Git.
+\end{itemize}
+
+Si une version particulière d'un fichier est dans le répertoire Git, il
+est considéré comme \textbf{validé}.
+
+S'il est modifié mais a été ajouté dans la zone d'index, il est
+\textbf{indexé}.
+
+S'il a été modifié depuis le dernier instantané mais n'a pas été indexé,
+il est \textbf{modifié}.
+
+\end{frame}
+
+\begin{frame}{Installer git}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://i.qkme.me/35nf3j.jpg}
+\caption{one does not simply install git on windows}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}
+
+\begin{block}{Officiel}
+
+http://git-scm.com/downloads
+
+Note: Binaire, installeur et source pour Windows, OS X, Linux, Solaris
+
+\end{block}
+
+\begin{block}{Windows}
+
+http://msysgit.github.io/
+
+\end{block}
+
+\begin{block}{LINUX}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Debian: \texttt{aptitude install git}
+\item
+  Ubuntu: \texttt{sudo apt-get install git}
+\item
+  ArchLinux: \texttt{pacman -S git}
+\end{itemize}
+
+\end{block}
+
+\begin{block}{OS X}
+
+Avec \href{http://brew.sh/}{Homebrew} \texttt{brew install git}
+
+Note: Ok mais a quoi ça ressemble ?
+
+\end{block}
+
+\end{frame}
+
+\begin{frame}
+
+\begin{block}{Interface graphique ?}
+
+http://git-scm.com/downloads/guis
+
+Note: Des interface graphique existe\ldots{} Vous pouvez les trouver la.
+À vous de choisir celle qui vous convient. Recommandé :
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  SmartGit (crossplatform, gratuit pour usage personnel)
+\item
+  SourceTree (sous mac, le plus populaire)
+\item
+  GitHub for Mac / Windows (attention : spécifique à GitHub)
+\end{itemize}
+
+\end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]{Configuration}
+
+http://git-scm.com/book/fr/Personnalisation-de-Git-Configuration-de-Git
+
+\begin{block}{Identité}
+
+\begin{verbatim}
+$ git config --global user.name "John Doe"
+$ git config --global user.email johndoe@example.com
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Couleur}
+
+\begin{verbatim}
+$ git config --global color.ui true
+\end{verbatim}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://i.imgur.com/v06N8.gif}
+\caption{bravo}
+\end{figure}
+
+Note: Et voilà, \texttt{git} est pret !
+
+\end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]{Commandes de base}
+
+\begin{block}{L'aide dans git}
+
+\begin{verbatim}
+$ git --help
+$ git add --help
+$ git <sub-command> --help
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Créer un dépôt local}
+
+\texttt{\$ git init}
+
+\end{block}
+
+\begin{block}{Cloner un dépôt existant}
+
+\begin{verbatim}
+$ git clone https://github.com/p-j/isep-git.git
+\end{verbatim}
+
+Note: Par défaut, cela créera un dossier \texttt{isep-git} à l'endroit
+où vous avez executé la commande. Ce dossier contiendra votre copie du
+dépôt.
+
+\end{block}
+
+\begin{block}{Récupérer le dépôt complet}
+
+\begin{verbatim}
+$ git clone https://github.com/p-j/isep-git.git
+$ git fetch --all
+\end{verbatim}
+
+Note: Permet de récupérer toutes les branches et pas uniquement la
+branche courrante (ie: \texttt{master} par défaut)
+
+\end{block}
+
+\begin{block}{Créer un instantané}
+
+\begin{block}{Changements spécifiques:}
+
+\begin{verbatim}
+$ git add *.html
+$ git add README.md
+$ git commit -m 'First commit'
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Tous les changements:}
+
+\begin{verbatim}
+$ git commit -am 'First commit'
+\end{verbatim}
+
+\end{block}
+
+\end{block}
+
+\begin{block}{Connaitre le status du dépôt}
+
+\begin{verbatim}
+$ git status
+\end{verbatim}
+
+\end{block}
+
+\end{frame}
+
+\section{To be continued\ldots{}}\label{to-be-continued}
+
+\begin{block}{Enlever un fichier}
+
+\begin{block}{De l'index}
+
+\begin{verbatim}
+$ git rm --cached file.html
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{De l'index et du disque dur}
+
+\begin{verbatim}
+$ git rm file.html
+\end{verbatim}
+
+\end{block}
+
+\end{block}
+
+\begin{block}{Déplacer des fichiers}
+
+Bien que git ne se préocuppe que du contenu, il y a une commade pour
+déplacer des fichiers.
+
+\begin{verbatim}
+$ git mv file1 file2
+\end{verbatim}
+
+Qui est l'équivalent de
+
+\begin{verbatim}
+$ mv file1 file2
+$ git rm file1
+$ git add file2
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Voir l'historique du dépôt}
+
+\begin{block}{Complet}
+
+\begin{verbatim}
+$ git log
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Filtrer par date}
+
+\begin{verbatim}
+$ git log --since=2.weeks
+$ git log --since="2 years 1 day 3 minutes ago"
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Format court avec graphique}
+
+\begin{verbatim}
+$ git log --pretty=oneline --decorate --graph
+\end{verbatim}
+
+\end{block}
+
+\end{block}
+
+\begin{block}{Voir les différences}
+
+\begin{block}{Les fichiers modifiés}
+
+\begin{verbatim}
+$ git diff
+\end{verbatim}
+
+\begin{block}{Les fichiers indexés}
+
+\begin{verbatim}
+$ git  diff --cached
+\end{verbatim}
+
+\end{block}
+
+\end{block}
+
+\begin{block}{Par rapport a une version spécifique}
+
+\begin{verbatim}
+$ git diff 7be56a
+git diff HEAD^
+\end{verbatim}
+
+\end{block}
+
+\end{block}
+
+\begin{block}{Voir les commits}
+
+\begin{block}{Le dernier commit}
+
+\begin{verbatim}
+$ git show
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Un commit spécifique}
+
+\begin{verbatim}
+$ git show 7be56a
+git show HEAD^
+\end{verbatim}
+
+\end{block}
+
+\end{block}
+
+\begin{block}{Revenir en arrière}
+
+\begin{block}{Modifier le dernier commit}
+
+\begin{verbatim}
+$ git commit --amend
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Désindexer un fichier}
+
+\begin{verbatim}
+$ git reset HEAD file.html
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Annuler les modifications d'un fichier modifier}
+
+\begin{verbatim}
+$ git checkout -- file.html
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Annuler un commit}
+
+\begin{verbatim}
+$ git revert 7be56a
+\end{verbatim}
+
+\end{block}
+
+\end{block}
+
+\begin{block}{Créer des tags}
+
+\begin{block}{Tags léger}
+
+\begin{verbatim}
+$ git tag v0.1.0
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Tags annotés}
+
+\begin{verbatim}
+$ git tag -a v0.1.0 -m 'Version 0.1.0'
+\end{verbatim}
+
+Note: Un tag est simplement un commit avec un nom un peu plus sympa
+qu'un hash. On s'en sert pour marquer des versions stable ou des points
+important dans le développement qui serviront de références.
+
+\end{block}
+
+\end{block}
+
+\begin{frame}[fragile]{.gitignore}
+
+\begin{verbatim}
+$ cat .gitignore 
+.DS_Store
+.svn
+log/*.log
+tmp/**
+node_modules/
+\end{verbatim}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Les lignes vides ou démarrant par un \texttt{\#} sont ignorées
+\item
+  Il est possible d'utiliser des jokers standards
+\item
+  Terminer un modèle par un slash \texttt{/} pour spécifier un dossier
+\item
+  Inverser un modèle avec un point d'exclamation \texttt{!}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}[fragile]{Remotes}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  Autre clones du même dépôt
+\item
+  Peut être local (un autre \texttt{checkout}) ou distant (collègue,
+  serveur central)
+\item
+  On peut configurer une valeur par défaut pour \texttt{push} et
+  \texttt{pull}
+\end{itemize}
+
+\begin{verbatim}
+$ git remote -v
+origin  git@github.com:p-j/isep-fsnp.git (fetch)
+origin  git@github.com:p-j/isep-fsnp.git (push)
+\end{verbatim}
+
+\begin{block}{Push to remote}
+
+\begin{block}{Sans valeur par défaut}
+
+\begin{verbatim}
+$ git push <remote> <rbranch>
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Configurer une valeur par défaut}
+
+\begin{verbatim}
+$ git push -u <remote> <rbranch>
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Puis}
+
+\begin{verbatim}
+$ git push 
+\end{verbatim}
+
+\end{block}
+
+\end{block}
+
+\begin{block}{Pull from remote}
+
+\begin{block}{FETCH \& MERGE}
+
+\begin{verbatim}
+$ git pull  [<remote> <rbranch>]
+\end{verbatim}
+
+Equivalent de
+
+\begin{verbatim}
+$ git fetch <remote>
+$ git merge <rbranch>
+\end{verbatim}
+
+\end{block}
+
+\end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]{Branches}
+
+Les branches sont des ``pointeurs'' vers des commits.
+\includegraphics{http://git-scm.com/figures/18333fig0308-tn.png}
+
+\begin{block}{Branches divergentes}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://git-scm.com/figures/18333fig0309-tn.png}
+\caption{schema branches divergentes}
+\end{figure}
+
+\end{block}
+
+\begin{block}{Fusionner des branches}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://git-scm.com/figures/18333fig0317-tn.png}
+\caption{schema fusion de branches}
+\end{figure}
+
+\end{block}
+
+\begin{block}{Conflits lors de la fusion}
+
+\begin{itemize}
+\item
+  Il y a plusieurs stratégie de fusion automatique (fast-forward, 3 way,
+  etc\ldots{})
+\item
+  Si ça ne fonctionne pas, il faut le faire à la main
+
+\begin{verbatim}
+$ git merge iss53
+Auto-merging index.html
+CONFLICT (content): Merge conflict in index.html
+Automatic merge failed; fix conflicts and then commit the result.
+\end{verbatim}
+\item
+  Ensuite, il faut le marquer comme résolue et finaliser le commit
+
+\begin{verbatim}
+$ git add index.html
+$ git commit
+\end{verbatim}
+\end{itemize}
+
+\end{block}
+
+\begin{block}{En général ça marche sans problème}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://memecrunch.com/meme/2KBX/git-branch-success/image.png}
+\caption{branch merged successful}
+\end{figure}
+
+\end{block}
+
+\begin{block}{Gestion des branches}
+
+\begin{block}{Créer une branche}
+
+\begin{verbatim}
+$ git branch iss53
+\end{verbatim}
+
+\begin{verbatim}
+$ git checkout -b iss53 master
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Changer de branche}
+
+\begin{verbatim}
+$ git checkout iss53
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Supprimer une branche}
+
+\begin{verbatim}
+$ git branch -d iss53
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Voire toutes les branches}
+
+\begin{verbatim}
+$ git branch
+  iss53
+* master
+  testing
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Voire le dernier commit sur chaque branches}
+
+\begin{verbatim}
+$ git branch -v
+  iss53 93b412c fix javascript issue
+* master 7a98805 Merge branch 'iss53'
+  testing 782fd34 add scott to the author list in the readmes
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Lister les branches fusionnées}
+
+\begin{verbatim}
+$ git branch --merged
+  iss53
+* master
+\end{verbatim}
+
+\end{block}
+
+\begin{block}{Lister les branches non fusionnées}
+
+\begin{verbatim}
+$ git branch --no-merged
+  testing
+\end{verbatim}
+
+\end{block}
+
+\end{block}
+
+\end{frame}
+
+\begin{frame}[fragile]{Stashing}
+
+\begin{verbatim}
+$ git stash
+$ git stash pop
+$ git stash list
+$ git stash apply
+$ git stash drop
+$ git stash clear
+\end{verbatim}
+
+Note: Utilisez git stash quand vous voulez enregistrer l'état actuel du
+répertoire de travail et de l'index, et revenir à un répertoire de
+travail propre. La commande enregistre vos modifications locales à part
+et mets à jour le répertoire de travail pour correspondre à la HEAD.
+
+Les modifications mise de côté par cette commande peuvent être listés
+avec \texttt{git stash list}, inspecté avec \texttt{git stash show}, et
+restauré (potentiellement par dessus ​​un autre commit) avec
+\texttt{git stash apply}. \texttt{git stash} sans aucun argument
+équivaut à \texttt{git stash save}. Une \texttt{stash} est par défaut
+répertorié comme «WIP sur branchname \ldots{}», mais vous pouvez donner
+un message plus explicite via la ligne de commande lorsque vous en créez
+un.
+
+\end{frame}
+
+\begin{frame}{Workflow courrant}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://git-scm.com/figures/18333fig0319-tn.png}
+\caption{schema common workflow}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Master comme branche stable}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  On ne commit dans master que du code stable
+\item
+  On commit le code instable dans une branche de développement
+\item
+  On déploie des patchs sur master
+\item
+  On merge les patchs dans la branche de développement
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Master comme branche de développement}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  On commit le code instable dans master
+\item
+  On créer des tags pour marquer les étapes stables
+\item
+  On créer une branche à partir d'un tag pour les patchs
+\item
+  On merge les patchs dans master
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Et maintenant ?}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics{http://memecrunch.com/meme/1BZ/git/image.png}
+\caption{git all the things}
+\end{figure}
+
+\end{frame}
+
+\begin{frame}{Resources}
+
+Très inspiré de
+\href{http://blog.dbrgn.ch/2013/2/7/git-introduction-presentation-slides/}{cette
+présentation} de \href{http://blog.dbrgn.ch/about/}{Danilo Bargen}
+
+\begin{itemize}
+\itemsep1pt\parskip0pt\parsep0pt
+\item
+  \href{http://goo.gl/jX95vy}{``Pro Git'' Book}
+\item
+  \href{http://goo.gl/eJODp8}{Git reference}
+\item
+  \href{http://goo.gl/mJJUXn}{Github git challenges}
+\item
+  \href{http://goo.gl/942WZ8}{Cheat sheet}
+\item
+  \href{http://ndpsoftware.com/git-cheatsheet.html}{Git Visual Cheat
+  sheet}
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Questions ?}
+
+\end{frame}
+
+\begin{frame}
+
+\begin{longtable}[c]{@{}ll@{}}
+\toprule
+Email & \url{jparker@isep.fr}\tabularnewline
+Twitter &
+{[}@jeremie\_parker{]}(https://twitter.com/jeremie\_parker)\tabularnewline
+GitHub &
+\href{https://github.com/p-j/isep-git}{p-j/isep-git}\tabularnewline
+\bottomrule
+\end{longtable}
+
+\end{frame}
+
+\end{document}
