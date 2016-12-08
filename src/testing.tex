@@ -124,11 +124,21 @@ Up until now, your workflow probably looks like this:
 
 
 \end{frame}
+
+%------------------------------
+\begin{frame}[fragile]
+
+Une solution
+
+\LARGE Le package testthat !!
+
+\end{frame}
 %------------------------------
 
 
 
-\begin{frame}[fragile]
+
+\begin{frame}[fragile]{Principes de testthat}
 Tests are organised hierarchically: \textit{expectations} are grouped into \textit{tests} which are organised in \textit{files}:
 
 \begin{itemize}
@@ -432,13 +442,36 @@ Each failure gives a description of the test (e.g., "Variance correct for discre
 
 
 \begin{frame}[fragile]{\texttt{test-} files}
+
 A test file lives in `tests/testthat/`. Its name must start with `test`. 
 
+\begin{Schunk}
+\begin{Sinput}
+> library(formationR)
+> context("exemple de test")
+> test_that("str_length is number of characters", {
++   expect_equal(str_length("a"), 1)
++   expect_equal(str_length("ab"), 2)
++   expect_equal(str_length("abc"), 3)
++ })
+\end{Sinput}
+\end{Schunk}
+
+\end{frame}
+
+
+%------------------------------
+
+\begin{frame}[fragile]{L'intégration continue}
+
+\alert{L'intégration continue : consite à tester chacune des réalisation modifiées, généralement lors d'un commit (voir partie sur le versionnement)}
 
 \begin{itemize}
-\item The highest-level structure of tests is the file. 
-\item Each file should contain a single `context()` call that provides a brief description of its contents. 
+\item Dans le cas de GitHub, un outil est disponible : Travis CI.
+\item A chaque commit, la construction du package est lancée, et paramétrée par un fichier yaml (voir aussi les entêtes de fichiers markdown)
+\item https://travis-ci.org/manumart/formation\_R/builds
 \end{itemize}
+
 \end{frame}
 
 %------------------------------

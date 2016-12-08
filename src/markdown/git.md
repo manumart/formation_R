@@ -1,10 +1,73 @@
 ---
-title: presentation  de Git
-fontsize: 17pt
+title: Git, GitHub et le versionnement
+fontsize: 14pt
 ...
 
+---
+
+## Qu'est ce que le versionnement?
++ Suivre l'évolution d'un fichier et garder trace de ses évolutions
+	+ pouvoir revenir en arrière
+	+ comprendre le pourquoi d'un nouveau comportement du programme
+
++ Les outils de versionnement intègrent la plupart du temps un système
+de modification concurrente du code, ce qui permet : 
+	+ de savoir qui a fait quelles modifications
+	+ de gérer des conflits de modifications (sur une même partie du code)
 
 --- 
+
+
+## Histoire des outils de verionnement
+
++ Ex : cvs, svn 
+
+![evolutionnary tree](../../images/scmhistory.png "tree")
+
+---
+
+## Edition concurrentielle (1/4)
+
+![svn](../../images/svn1.png "svn")
+
+---
+
+## Edition concurrentielle (1/4)
+
+![svn](../../images/svn2.png "svn")
+
+
+---
+
+## Edition concurrentielle (1/4)
+
+![svn](../../images/svn3.png "svn")
+
+
+
+---
+
+## Edition concurrentielle (1/4)
+
+![svn](../../images/svn4.png "svn")
+
+
+---
+
+## quelques actions principales, donc : 
+ + checkout, clone : récupère le projet depuis le serveur
+ + update, pull : mise à jour locale des modification réalisée sur le serveur
+ + commit : valide ses modifications locales
+ + status : état de mes modifications locales?
+ + diff : différences d'état entre le local et le serveur
+
+ + et un principe général : effectuer le plus de modifications locales sur la 
+structure du code (renommage de fichiers, de répertoires, déplacement, supression,
+etc.) à l'aide de l'outil de versionnement.
+
+--- 
+
+## Git
 
 ![git](http://git-scm.com/images/logos/downloads/Git-Logo-2Color.png "git")
 
@@ -17,7 +80,9 @@ fontsize: 17pt
 + Flexible
 
 Note:
-Inspiré par BitKeeper et créé en 2005 pour le remplacer après que la gratuité de ce dernier soit révoqué.
+Inspiré par BitKeeper et créé en 2005 par Linux Torvalds (et Junio Hamano) pour le remplacer après que la gratuité de ce dernier soit révoqué. Linus Torvalds est le créateur de Linux...
+
+A propos du nom "je ne suis q'un égocentrique, donc je n'appelle mes créations que du nom de ma propre personne". Git est assez péjoratif en anglais...
 
 ---
 
@@ -71,20 +136,6 @@ Git gère trois états dans lesquels les fichiers peuvent résider : validé, mo
 + Modifié : vous avez modifié le fichier mais qu'il n'a pas encore été validé en base. 
 + Indexé : vous avez marqué un fichier modifié dans sa version actuelle pour qu'il fasse partie du prochain instantané du projet.
 
-
-
----
-
-
-## Le dossier git
-
-
-Le répertoire de travail est une extraction unique d'une version du projet. Ces fichiers sont extraits depuis la base de données compressée dans le répertoire Git et placés sur le disque pour pouvoir être utilisés ou modifiés.
-
-La zone d'index est un simple fichier, généralement situé dans le répertoire Git, qui stocke les informations concernant ce qui fera partie du prochain instantané.
-
-Note:
-Le répertoire Git est l'endroit où Git stocke les méta-données et la base de données des objets de votre projet. C'est la partie la plus importante de Git, et c'est ce qui est copié lorsque vous clonez un dépôt depuis un autre ordinateur.
 
 ---
 
@@ -163,6 +214,229 @@ Et voilà, `git` est pret !
 
 ---
 
+
+
+## Commandes de base
+
+### L'aide dans git
+```
+$ git --help
+$ git add --help
+$ git <sub-command> --help
+```
+
+---
+
+### Créer un dépôt local
+`$ git init`
+
+
+### Cloner un dépôt existant
+```
+$ git clone https://github.com/p-j/isep-git.git
+```
+
+Note:
+Par défaut, cela créera un dossier `isep-git` à l'endroit où vous avez executé la commande.
+Ce dossier contiendra votre copie du dépôt.
+
+---
+
+### Récupérer le dépôt complet
+```
+$ git clone https://github.com/p-j/isep-git.git
+$ git fetch --all
+```
+
+Note:
+Permet de récupérer toutes les branches et pas uniquement la branche courrante (ie: `master` par défaut)
+
+---
+
+### Créer un instantané 
+#### Changements spécifiques:
+```
+$ git add *.html
+$ git add README.md
+$ git commit -m 'First commit'
+```
+#### Tous les changements:
+```
+$ git commit -am 'First commit'
+```
+---
+
+### Connaitre le status du dépôt
+```
+$ git status
+```
+
+---
+
+### Enlever un fichier
+#### De l'index
+```
+$ git rm --cached file.html
+```
+#### De l'index et du disque dur
+```
+$ git rm file.html
+```
+---
+
+### Déplacer des fichiers
+Bien que git ne se préocuppe que du contenu, il y a une commade pour déplacer des fichiers.
+```
+$ git mv file1 file2
+```
+Qui est l'équivalent de 
+```
+$ mv file1 file2
+$ git rm file1
+$ git add file2
+```
+---
+
+### Voir l'historique du dépôt
+#### Complet
+```
+$ git log
+```
+#### Filtrer par date
+```
+$ git log --since=2.weeks
+$ git log --since="2 years 1 day 3 minutes ago"
+```
+
+---
+
+#### Format court avec graphique
+```
+$ git log --pretty=oneline --decorate --graph
+```
+
+
+### Voir les différences
+#### Les fichiers modifiés
+```
+$ git diff
+```
+---
+
+##### Les fichiers indexés
+```
+$ git  diff --cached
+```
+
+#### Par rapport a une version spécifique
+```
+$ git diff 7be56a
+git diff HEAD^
+```
+---
+
+### Voir les commits
+#### Le dernier commit
+```
+$ git show
+```
+#### Un commit spécifique
+```
+$ git show 7be56a
+git show HEAD^
+```
+---
+
+### Revenir en arrière
+#### Modifier le dernier commit
+```
+$ git commit --amend
+```
+#### Désindexer un fichier
+```
+$ git reset HEAD file.html
+```
+#### Annuler les modifications d'un fichier modifier
+```
+$ git checkout -- file.html
+```
+#### Annuler un commit 
+```
+$ git revert 7be56a
+```
+---
+
+### Créer des tags
+#### Tags léger
+```
+$ git tag v0.1.0
+```
+#### Tags annotés
+```
+$ git tag -a v0.1.0 -m 'Version 0.1.0'
+```
+
+Note:
+Un tag est simplement un commit avec un nom un peu plus sympa qu'un hash. On s'en sert pour marquer des versions stable ou des points important dans le développement qui serviront de références.
+
+---
+
+## .gitignore
+```
+$ cat .gitignore 
+.DS_Store
+.svn
+log/*.log
+tmp/**
+node_modules/
+```
++ Les lignes vides ou démarrant par un `#` sont ignorées
++ Il est possible d'utiliser des jokers standards
++ Terminer un modèle par un slash `/` pour spécifier un dossier
++ Inverser un modèle avec un point d'exclamation `!`
+
+---
+
+## Remotes
++ Autre clones du même dépôt
++ Peut être local (un autre `checkout`) ou distant (collègue, serveur central)
++ On peut configurer une valeur par défaut pour `push` et `pull`
+
+```
+$ git remote -v
+origin  git@github.com:p-j/isep-fsnp.git (fetch)
+origin  git@github.com:p-j/isep-fsnp.git (push)
+```
+---
+
+### Push to remote
+#### Sans valeur par défaut
+```
+$ git push <remote> <rbranch>
+```
+#### Configurer une valeur par défaut
+```
+$ git push -u <remote> <rbranch>
+```
+#### Puis
+```
+$ git push 
+```
+---
+
+### Pull from remote
+#### FETCH & MERGE
+```
+$ git pull  [<remote> <rbranch>]
+```
+Equivalent de
+```
+$ git fetch <remote>
+$ git merge <rbranch>
+```
+
+---
+
 ## Branches
 Les branches sont des "pointeurs" vers des commits.
 ![schema branch 1](http://git-scm.com/figures/18333fig0308-tn.png "schema branch 1")
@@ -188,6 +462,24 @@ Les branches sont des "pointeurs" vers des commits.
 
 ---
 
+## GitHub
+
+### J'allais oublier...
+
++ Github : plateforme web qui sert de serveur et d'interface à Git
++ Non recommandé par Linus Torvalds car limite fortement les possibilités de Git
++ Néanmoins adopté par de nombreux projets, et notamment des projets R (Hadley Wickham a l'air d'être un grand fan...)
++ cf. le package devtools et ses fonctions dédiées (`install_github()` etc.)
+
+---
+
+### A quoi cela ressemble? 
+ 
+
+<a "https://github.com/manumart/formation_R">https://github.com/manumart/formation_R</a>
+
+---
+
 ## Resources
 
 Très (très) inspirée de [https://github.com/p-j/isep-git/blob/master/data/slides.md](https://github.com/p-j/isep-git/blob/master/data/slides.md)
@@ -208,6 +500,23 @@ Très (très) inspirée de [https://github.com/p-j/isep-git/blob/master/data/sli
 ---
 
 
+## Compléments
+
+
+---
+
+
+## Le dossier git
+
+
+Le répertoire de travail est une extraction unique d'une version du projet. Ces fichiers sont extraits depuis la base de données compressée dans le répertoire Git et placés sur le disque pour pouvoir être utilisés ou modifiés.
+
+La zone d'index est un simple fichier, généralement situé dans le répertoire Git, qui stocke les informations concernant ce qui fera partie du prochain instantané.
+
+Note:
+Le répertoire Git est l'endroit où Git stocke les méta-données et la base de données des objets de votre projet. C'est la partie la plus importante de Git, et c'est ce qui est copié lorsque vous clonez un dépôt depuis un autre ordinateur.
+
+---
 
 ## Master comme branche stable
 + On ne commit dans master que du code stable
@@ -215,6 +524,7 @@ Très (très) inspirée de [https://github.com/p-j/isep-git/blob/master/data/sli
 + On déploie des patchs sur master
 + On merge les patchs dans la branche de développement
 
+---
 
 ## Master comme branche de développement
 + On commit le code instable dans master
@@ -223,221 +533,7 @@ Très (très) inspirée de [https://github.com/p-j/isep-git/blob/master/data/sli
 + On merge les patchs dans master
 
 
-## Compléments
-## Commandes de base
-
-### L'aide dans git
-```
-$ git --help
-$ git add --help
-$ git <sub-command> --help
-```
-
-
-### Créer un dépôt local
-`$ git init`
-
-
-### Cloner un dépôt existant
-```
-$ git clone https://github.com/p-j/isep-git.git
-```
-
-Note:
-Par défaut, cela créera un dossier `isep-git` à l'endroit où vous avez executé la commande.
-Ce dossier contiendra votre copie du dépôt.
-
-
-### Récupérer le dépôt complet
-```
-$ git clone https://github.com/p-j/isep-git.git
-$ git fetch --all
-```
-
-Note:
-Permet de récupérer toutes les branches et pas uniquement la branche courrante (ie: `master` par défaut)
-
-
-### Créer un instantané 
-#### Changements spécifiques:
-```
-$ git add *.html
-$ git add README.md
-$ git commit -m 'First commit'
-```
-#### Tous les changements:
-```
-$ git commit -am 'First commit'
-```
-
-
-### Connaitre le status du dépôt
-```
-$ git status
-```
-
-
-
-# To be continued...
-
-
-
-### Enlever un fichier
-#### De l'index
-```
-$ git rm --cached file.html
-```
-#### De l'index et du disque dur
-```
-$ git rm file.html
-```
-
-
-### Déplacer des fichiers
-Bien que git ne se préocuppe que du contenu, il y a une commade pour déplacer des fichiers.
-```
-$ git mv file1 file2
-```
-Qui est l'équivalent de 
-```
-$ mv file1 file2
-$ git rm file1
-$ git add file2
-```
-
-
-### Voir l'historique du dépôt
-#### Complet
-```
-$ git log
-```
-#### Filtrer par date
-```
-$ git log --since=2.weeks
-$ git log --since="2 years 1 day 3 minutes ago"
-```
-#### Format court avec graphique
-```
-$ git log --pretty=oneline --decorate --graph
-```
-
-
-### Voir les différences
-#### Les fichiers modifiés
-```
-$ git diff
-```
-##### Les fichiers indexés
-```
-$ git  diff --cached
-```
-
-#### Par rapport a une version spécifique
-```
-$ git diff 7be56a
-git diff HEAD^
-```
-
-
-### Voir les commits
-#### Le dernier commit
-```
-$ git show
-```
-#### Un commit spécifique
-```
-$ git show 7be56a
-git show HEAD^
-```
-
-
-### Revenir en arrière
-#### Modifier le dernier commit
-```
-$ git commit --amend
-```
-#### Désindexer un fichier
-```
-$ git reset HEAD file.html
-```
-#### Annuler les modifications d'un fichier modifier
-```
-$ git checkout -- file.html
-```
-#### Annuler un commit 
-```
-$ git revert 7be56a
-```
-
-
-### Créer des tags
-#### Tags léger
-```
-$ git tag v0.1.0
-```
-#### Tags annotés
-```
-$ git tag -a v0.1.0 -m 'Version 0.1.0'
-```
-
-Note:
-Un tag est simplement un commit avec un nom un peu plus sympa qu'un hash. On s'en sert pour marquer des versions stable ou des points important dans le développement qui serviront de références.
-
-
-
-## .gitignore
-```
-$ cat .gitignore 
-.DS_Store
-.svn
-log/*.log
-tmp/**
-node_modules/
-```
-+ Les lignes vides ou démarrant par un `#` sont ignorées
-+ Il est possible d'utiliser des jokers standards
-+ Terminer un modèle par un slash `/` pour spécifier un dossier
-+ Inverser un modèle avec un point d'exclamation `!`
-
-
-
-## Remotes
-+ Autre clones du même dépôt
-+ Peut être local (un autre `checkout`) ou distant (collègue, serveur central)
-+ On peut configurer une valeur par défaut pour `push` et `pull`
-
-```
-$ git remote -v
-origin  git@github.com:p-j/isep-fsnp.git (fetch)
-origin  git@github.com:p-j/isep-fsnp.git (push)
-```
-
-
-### Push to remote
-#### Sans valeur par défaut
-```
-$ git push <remote> <rbranch>
-```
-#### Configurer une valeur par défaut
-```
-$ git push -u <remote> <rbranch>
-```
-#### Puis
-```
-$ git push 
-```
-
-
-### Pull from remote
-#### FETCH & MERGE
-```
-$ git pull  [<remote> <rbranch>]
-```
-Equivalent de
-```
-$ git fetch <remote>
-$ git merge <rbranch>
-```
+---
 
 ### Gestion des branches
 
@@ -457,7 +553,7 @@ $ git checkout iss53
 ```
 $ git branch -d iss53
 ```
-
+---
 
 #### Voire toutes les branches
 ```
@@ -473,7 +569,7 @@ $ git branch -v
 * master 7a98805 Merge branch 'iss53'
   testing 782fd34 add scott to the author list in the readmes
 ```
-
+---
 
 #### Lister les branches fusionnées
 ```
@@ -486,7 +582,7 @@ $ git branch --merged
 $ git branch --no-merged
   testing
 ```
-
+---
 
 
 ## Stashing
@@ -502,9 +598,12 @@ $ git stash clear
 Note: 
 Utilisez git stash quand vous voulez enregistrer l'état actuel du répertoire de travail et de l'index, et revenir à un répertoire de travail propre. La commande enregistre vos modifications locales à part et mets à jour le répertoire de travail pour correspondre à la HEAD.
 
+
+---
+
 Les modifications mise de côté par cette commande peuvent être listés avec `git stash list`, inspecté avec `git stash show`, et restauré (potentiellement par dessus un autre commit) avec `git stash apply`. `git stash` sans aucun argument équivaut à `git stash save`. Une `stash` est par défaut répertorié comme «WIP sur branchname ...», mais vous pouvez donner un message plus explicite via la ligne de commande lorsque vous en créez un.
 
-
+---
 
 ### Identité
 ```
