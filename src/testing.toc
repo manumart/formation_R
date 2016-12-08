@@ -1,5 +1,0 @@
-\beamer@endinputifotherversion {3.24pt}
-\beamer@sectionintoc {1}{Expectations}{9}{0}{1}
-\beamer@sectionintoc {2}{Writing tests}{16}{0}{2}
-\beamer@subsectionintoc {2}{1}{What to test}{17}{0}{2}
-\beamer@sectionintoc {3}{Test workflow for package creation}{20}{0}{3}
