@@ -1,0 +1,15 @@
+ digraph hierarchy { 
+ size="5,5" 
+ node[shape=record,style=filled,fillcolor=gray95] 
+ edge[dir=back, arrowtail=empty] 
+
+
+ 2[label = "{Vélo|+ roues\n+ cadre|roule()}"] 
+ 3[label = "{VTT|...| rouleDansLaMontagne()}"] 
+ 4[label = "{VéloDeRoute| gardeBoue| ...}"] 
+
+
+ 2->3 
+ 2->4 
+
+ } 

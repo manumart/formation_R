@@ -1,0 +1,199 @@
+---
+title: "Programmation orientée objets avec le package R6"
+author: "Manuel Martin, INRA"
+date: |
+  06/02/2017
+  
+
+knit: (function(inputFile, encoding) { 
+        rmarkdown::render(
+          inputFile,
+          encoding = encoding, 
+          output_dir = "./",
+          output_format = "slidy_presentation"
+        ) 
+      })
+---
+
+```{r license, include = FALSE}
+# Copyright (C) 2016  Facundo Muñoz
+# 
+# This script is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This script is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# <http://www.gnu.org/licenses/>.
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Pourquoi la Programmation Orientée Objet (POO => OOP)
+
+Trois avantages principaux
+
+- Facilite la programmation modulaire
+  - classes => composants réutilisables
+  - cache les détails d'implémentaitions non indispensables à la compréhension
+  - notions d'interfaces d'une classe à une autre
+- Facilie l'abstraction
+  - extraire un modèle commun à plusieurs composants
+  - composants héritables
+- Facilite la spécialisation
+  - qui traite de cas particuliers
+
+
+# OOP, les bases
+
+ <img src="/home/manuel/tmp/formation_R/src/schemas/classDiagram.png" />
+
+
+
+OOP sous R
+========================================================
+
+- Une description utile [http://adv-r.had.co.nz/OO-essentials.html](http://adv-r.had.co.nz/OO-essentials.html)
+- et une autre pour les classes R6 [https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html](https://cran.r-project.org/web/packages/R6/vignettes/Introduction.html)
+
+
+OOP sous R
+========================================================
+
+ 1. **S3** : le plus simple, utilisé dans les pacakges de base `base` et `stats`, et c'est le plus couramment rencontré sur le CRAN - Exemple des fonctions `generic.class()`
+ 1. **S4** : comme S3, les méthodes sont définies à l'extérieur des classes, mais ajoute la notion de slot (`@`) et le mécanisme d'héritage
+ 1. **RC** (reference classes) : depuis R 2.12 . Les méthodes appartiennent désormais aux objets, et ils sont *mutables*.
+ 1. **R6** : Ressemble à RC, mais plus efficace et ressemble encore plus aux principaux langages OOP.
+
+```{r}
+ b <- 1
+ a <- b
+ b <- 3
+ a
+```
+
+
+
+R6
+========================================================
+
+- Méthodes publiques and privées
+- **active bindings**
+- Mécanisme d'héritage, applicable sur différents packages
+
+Exemple
+=======================================================
+```{r}
+library(R6)
+
+Profil <- R6Class("Profil",
+  public = list(
+    name = NULL,
+    horizons = NULL, ## a data.frame
+    depth = NULL,
+    initialize = function(horizons = NA, depth = NA, name = NA) {
+      self$name <- name
+      self$horizons <- horizons
+      self$depth <- depth
+      self$greet()
+    },
+    greet = function() {
+      cat(paste0("Hello, my name is ", self$name, ".\n"))
+    },
+      setMetadata = function(texte){
+	private$metadata <- texte
+    }
+  ),
+  private = list(
+	metadata = NULL
+  )
+)
+```
+
+Création d'une instance de classe
+=======================================================
+```{r}
+prof <- Profil$new(depth = 40, name = "very first one")
+prof$setMetadata("ce profil est localisé chez Monsieur alambic")
+
+horizons <- data.frame(tops = c(0, 5, 15), bottoms = c(5, 15, 30),
+                      carbon = c(13, 2.5, 1.2))
+prof$horizons <- horizons
+```
+
+Ajout d'une fonction plot()
+=======================================================
+```{r}
+Profil <- R6Class("Profil",
+  public = list(
+    name = NULL,
+    horizons = NULL, ## a data.frame
+    depth = NULL,
+    initialize = function(horizons = NA, depth = NA, name = NA) {
+      self$name <- name
+      self$horizons <- horizons
+      self$depth <- depth
+    },
+    plot = function(){
+	plot(0,1, col = "white", xaxt = 'n',
+             xlim = c(0, ceiling(max(self$horizons$carbon))),
+             ylim = c(self$depth, 0))
+	axis(3)
+	rect(rep(0, 4), self$horizons$bottoms, self$horizons$carbon,
+	     self$horizons$tops, col = "brown")
+    }
+  ),
+)
+
+```
+
+Ajout d'une fonction plot()
+=======================================================
+```{r}
+prof <- Profil$new(horizons = horizons, depth = 40, 
+                  name = "very first one")
+prof$plot()
+
+```
+
+Spécialisation
+=======================================================
+```{r}
+require(infosolR)
+
+### with splines
+ProfilWithSplines <- R6Class("ProfilWithSplines",
+    inherit = Profil,
+    public = list(
+    splinee = NULL,
+    initialize = function(horizons = NA, depth = NA, name = NA) {
+      super$initialize(horizons, depth, name)
+      self$splinee <- fitSpline(self$horizons$carbon,
+	 			self$horizons$tops,
+				self$horizons$bottoms,
+				lambda = 0.5)
+    },
+    plot = function(){
+	super$plot()
+	depths <- (self$horizons$bottoms + self$horizons$tops) / 2
+	lines(predSpline(0:max(depths), self$splinee),
+                         (0:max(depths)))
+    }
+  )
+)
+```
+
+
+Spécialisation
+=======================================================
+```{r}
+profWithSpline <- ProfilWithSplines$new(horizons = horizons, depth = 40,
+                                        name = "very first one")
+profWithSpline$plot()
+```
