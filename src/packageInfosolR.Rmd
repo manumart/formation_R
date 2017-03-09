@@ -1,0 +1,82 @@
+---
+title: "Package InfosolR"
+author: "Manuel Martin, INRA"
+date: |
+  06/02/2017
+  
+
+knit: (function(inputFile, encoding) { 
+        rmarkdown::render(
+          inputFile,
+          encoding = encoding, 
+          output_dir = "./",
+          output_format = "slidy_presentation"
+        ) 
+      })
+---
+
+```{r license, include = FALSE}
+# Copyright (C) 2016  Facundo Muñoz
+# 
+# This script is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+# 
+# This script is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# <http://www.gnu.org/licenses/>.
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Historique
+
+- 02/2014 : listing des traitements les plus utilisés, et ses 3 traitements les plus généralisables
+- [https://forge.orleans.inra.fr/projects/traitement-infosol/repository/revisions/6079/show/outils_traitement/trunk/packages_R]
+
+* Statistiques de validation de prédictions
+    + qualitatives
+    + quantitatives
+* Couplage GBM et geostatistiques
+    + retiré car problèmes avec les librairies parallèles
+* Traitement de données de profil
+    + splines
+    + intégration de variables sur une profondeur donnée
+
+
+# Listing des traitements
+========================================================
+ <img src="/home/manuel/tmp/formation_R/images/tasks_InfosolR.png" />
+
+
+
+# Un package pour quoi faire?
+========================================================
+
+- intérêt par rapport à du partage de code?
+- partage de code réutilisable en l'état et non disponible ailleurs?
+- partage et archivage de ptfs, de modèles?
+- procédures pour produire des cartes?
+
+# Comment ça marche actuellement
+========================================================
+
+ <img src="/home/manuel/tmp/formation_R/images/digraph.png" />
+<!-- digraph finite_state_machine { -->
+<!-- 	rankdir=LR; -->
+
+<!-- 	node [shape = circle]; -->
+<!-- 	"développements traitement" -> "serveur svn" [ label = "commit" ]; -->
+<!-- 	"serveur svn" -> "copie locale" [ label = "checkout" ]; -->
+<!-- 	"copie locale" -> "projet package" [ label = "copy" ]; -->
+<!--         "code de construction" -> "infosolR.tar.gz" [ label = "build" ]; -->
+<!--         "projet package" -> "infosolR.tar.gz" [ label = "build" ]; -->
+<!--         "infosolR.tar.gz" -> "serveur svn" -->
+<!-- "projet package" -> "serveur svn" -->
+<!-- } -->
