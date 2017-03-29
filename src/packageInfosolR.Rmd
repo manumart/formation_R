@@ -67,16 +67,6 @@ knitr::opts_chunk$set(echo = TRUE)
 # Comment ça marche actuellement
 ========================================================
 
- <img src="/home/manuel/tmp/formation_R/images/digraph.png" />
-<!-- digraph finite_state_machine { -->
-<!-- 	rankdir=LR; -->
+ <img src="/home/manuel/tmp/formation_R/images/infosolRGraph.png" />
 
-<!-- 	node [shape = circle]; -->
-<!-- 	"développements traitement" -> "serveur svn" [ label = "commit" ]; -->
-<!-- 	"serveur svn" -> "copie locale" [ label = "checkout" ]; -->
-<!-- 	"copie locale" -> "projet package" [ label = "copy" ]; -->
-<!--         "code de construction" -> "infosolR.tar.gz" [ label = "build" ]; -->
-<!--         "projet package" -> "infosolR.tar.gz" [ label = "build" ]; -->
-<!--         "infosolR.tar.gz" -> "serveur svn" -->
-<!-- "projet package" -> "serveur svn" -->
-<!-- } -->
+

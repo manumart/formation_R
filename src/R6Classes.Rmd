@@ -39,15 +39,16 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Trois avantages principaux
 
+
 - Facilite la programmation modulaire
-  - classes => composants réutilisables
-  - cache les détails d'implémentaitions non indispensables à la compréhension
-  - notions d'interfaces d'une classe à une autre
-- Facilie l'abstraction
-  - extraire un modèle commun à plusieurs composants
-  - composants héritables
-- Facilite la spécialisation
-  - qui traite de cas particuliers
+    + classes => composants réutilisables
+    + cache les détails d'implémentaitions non indispensables à la compréhension
+    + notions d'interfaces d'une classe à une autre
+* Facilite l'abstraction
+    + extraire un modèle commun à plusieurs composants
+    + composants héritables
+* Facilite la spécialisation
+    + qui traite de cas particuliers
 
 
 # OOP, les bases
@@ -66,7 +67,7 @@ OOP sous R
 OOP sous R
 ========================================================
 
- 1. **S3** : le plus simple, utilisé dans les pacakges de base `base` et `stats`, et c'est le plus couramment rencontré sur le CRAN - Exemple des fonctions `generic.class()`
+ 1. **S3** : le plus simple, utilisé dans les packages de ``base`` et `stats`, et c'est le plus couramment rencontré sur le CRAN - Exemple des fonctions `generic.class()`
  1. **S4** : comme S3, les méthodes sont définies à l'extérieur des classes, mais ajoute la notion de slot (`@`) et le mécanisme d'héritage
  1. **RC** (reference classes) : depuis R 2.12 . Les méthodes appartiennent désormais aux objets, et ils sont *mutables*.
  1. **R6** : Ressemble à RC, mais plus efficace et ressemble encore plus aux principaux langages OOP.

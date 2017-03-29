@@ -61,15 +61,21 @@ Manuel Martin, INRA
 <h1>Pourquoi la Programmation Orientée Objet (POO =&gt; OOP)</h1>
 <p>Trois avantages principaux</p>
 <ul>
-<li>Facilite la programmation modulaire</li>
+<li>Facilite la programmation modulaire
+<ul>
 <li>classes =&gt; composants réutilisables</li>
 <li>cache les détails d’implémentaitions non indispensables à la compréhension</li>
 <li>notions d’interfaces d’une classe à une autre</li>
-<li>Facilie l’abstraction</li>
+</ul></li>
+<li>Facilite l’abstraction
+<ul>
 <li>extraire un modèle commun à plusieurs composants</li>
 <li>composants héritables</li>
-<li>Facilite la spécialisation</li>
+</ul></li>
+<li>Facilite la spécialisation
+<ul>
 <li>qui traite de cas particuliers</li>
+</ul></li>
 </ul>
 </div>
 <div id="oop-les-bases" class="slide section level1">
@@ -86,7 +92,7 @@ Manuel Martin, INRA
 <div id="oop-sous-r-1" class="slide section level1">
 <h1>OOP sous R</h1>
 <ol style="list-style-type: decimal">
-<li><strong>S3</strong> : le plus simple, utilisé dans les pacakges de base <code>base</code> et <code>stats</code>, et c’est le plus couramment rencontré sur le CRAN - Exemple des fonctions <code>generic.class()</code></li>
+<li><strong>S3</strong> : le plus simple, utilisé dans les packages de base <code>base</code> et <code>stats</code>, et c’est le plus couramment rencontré sur le CRAN - Exemple des fonctions <code>generic.class()</code></li>
 <li><strong>S4</strong> : comme S3, les méthodes sont définies à l’extérieur des classes, mais ajoute la notion de slot (<code>@</code>) et le mécanisme d’héritage</li>
 <li><strong>RC</strong> (reference classes) : depuis R 2.12 . Les méthodes appartiennent désormais aux objets, et ils sont <em>mutables</em>.</li>
 <li><strong>R6</strong> : Ressemble à RC, mais plus efficace et ressemble encore plus aux principaux langages OOP.</li>
