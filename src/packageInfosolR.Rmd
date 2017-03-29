@@ -64,9 +64,16 @@ knitr::opts_chunk$set(echo = TRUE)
 - partage et archivage de ptfs, de modèles?
 - procédures pour produire des cartes?
 
+# Bilan réunion précédente
+- It is time to encourage improvements in the package
+- Opportunity to incorporate pedotransfer functions, models, and methods (e.g., routines for development of DSM). 
+- Need to index the other scripts.
+
 # Comment ça marche actuellement
 ========================================================
 
  <img src="/home/manuel/tmp/formation_R/images/infosolRGraph.png" />
 
+# Intervenants
 
+https://www.draw.io/#Hmanumart%2Fformation_R%2Fmaster%2Fimages%2FinfosolRProjectGroup.xml
