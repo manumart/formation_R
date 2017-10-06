@@ -1,10 +1,10 @@
 @title[Introduction]
-# Git<span style="color: #e49436">Pitch</span>
+# Outils de visualisation sous <span style="color: #e49436">R</span>
 
 #### Markdown Presentations For Everyone on Git.*
 <br>
 <br>
-<span style="color: #bbb; font-size: 80%">[ GitHub, GitLab, Bitbucket, GitBucket, Gitea, Gogs ]</span>
+<span style="color: #bbb; font-size: 80%">[ Réunion traitement 06/10 ]</span>
 
 ---
 @title[PITCHME.md]
