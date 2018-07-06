@@ -20,6 +20,6 @@
 set -o nounset                              # Treat unset variables as an error
 #needsi parallel, doParallel, boot, MPV to be installed
 
-Rscript -e 'require(knitr); knit("parallel.Rmd")'
+Rscript -e 'require(knitr); knit("parallel.Rmd"); purl("parallel.Rmd")'
 pandoc -t beamer parallel.md parallel.pdf
 evince parallel.pdf &
