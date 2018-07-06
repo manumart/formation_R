@@ -1,0 +1,111 @@
+/*@font-face {
+    font-family: GeoSansLight;
+    src: GeosansLight.ttf;
+}
+
+
+* {
+    font-family: GeoSansLight !important;
+}
+*/
+slides > slide.title-slide hgroup h1 {
+  font-weight: bold;
+  font-size: 30pt;
+  position: absolute;
+  top: -75%;
+  left: 0%;
+  right: -100%;
+  transform: translate(0%, 0%);
+  width: 900px;
+}
+
+slides > slide.title-slide p {
+    font-size: 20pt;
+}
+
+slides > slide:not(.nobackground):before { /*ça c'est pour le logo du bas*/
+    background-size: 121px 43px;
+    padding-left: 121px;
+    padding-top: 43px;
+    bottom: 5px;
+}
+/*
+html, li {
+    font-size: 106%;
+}
+*/
+.zoomDiv {
+  opacity: 0;
+  background-color: white;
+  position:absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 50;
+  transform: translate(-50%, -50%);
+  box-shadow: 0px 0px 50px #888888;
+  max-height: 100%; 
+  overflow: scroll;
+}
+
+.zoomImg {
+  width: 100%;
+}
+
+.topcorner {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.verticallyCenter {
+/*    width: 300px;
+    height: 300px;
+    background-color: red;*/
+
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+}
+/*slides > slide.not(.nobackground):before {
+    left: 13px;
+    bottom: 13px;
+    background-size: 100px 100px;
+    padding-left: 100px;
+    height: 42px;
+}*/
+
+.graphName {
+    position: absolute;
+    left: 45px;
+}
+
+.graphName2 {
+    position: absolute;
+    left: 9px;
+    text-align: right;
+    width: 93px;
+    font-size: 16pt;
+}
+
+b, strong {
+    font-weight: bolder;
+}
+
+em {
+    font-style: italic;
+/*    text-decoration: underline;*/
+}
+
+aside.gdbar img { /*ça c'est le logo de la page de titre*/
+    width: 190px;
+    height: 67px;
+    top: 10px;
+}
+
+.emphasized {
+   font-size: 1.5em;
+}

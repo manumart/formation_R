@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+ "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Style-Type" content="text/css" />
+  <meta name="generator" content="pandoc" />
+  <meta name="author" content="Formation R avancé. INRA." />
+  <title>Introduction to parallel computing with R</title>
+  <style type="text/css">code{white-space: pre;}</style>
+  <style type="text/css">
+div.sourceCode { overflow-x: auto; }
+table.sourceCode, tr.sourceCode, td.lineNumbers, td.sourceCode {
+  margin: 0; padding: 0; vertical-align: baseline; border: none; }
+table.sourceCode { width: 100%; line-height: 100%; }
+td.lineNumbers { text-align: right; padding-right: 4px; padding-left: 4px; color: #aaaaaa; border-right: 1px solid #aaaaaa; }
+td.sourceCode { padding-left: 5px; }
+code > span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code > span.dt { color: #902000; } /* DataType */
+code > span.dv { color: #40a070; } /* DecVal */
+code > span.bn { color: #40a070; } /* BaseN */
+code > span.fl { color: #40a070; } /* Float */
+code > span.ch { color: #4070a0; } /* Char */
+code > span.st { color: #4070a0; } /* String */
+code > span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code > span.ot { color: #007020; } /* Other */
+code > span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code > span.fu { color: #06287e; } /* Function */
+code > span.er { color: #ff0000; font-weight: bold; } /* Error */
+code > span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+code > span.cn { color: #880000; } /* Constant */
+code > span.sc { color: #4070a0; } /* SpecialChar */
+code > span.vs { color: #4070a0; } /* VerbatimString */
+code > span.ss { color: #bb6688; } /* SpecialString */
+code > span.im { } /* Import */
+code > span.va { color: #19177c; } /* Variable */
+code > span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code > span.op { color: #666666; } /* Operator */
+code > span.bu { } /* BuiltIn */
+code > span.ex { } /* Extension */
+code > span.pp { color: #bc7a00; } /* Preprocessor */
+code > span.at { color: #7d9029; } /* Attribute */
+code > span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code > span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code > span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+  </style>
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+    href="http://www.w3.org/Talks/Tools/Slidy2/styles/slidy.css" />
+  <link rel="stylesheet" type="text/css" media="screen, projection, print"
+   href="figure/styles.css" />
+  <script src="http://www.w3.org/Talks/Tools/Slidy2/scripts/slidy.js"
+    charset="utf-8" type="text/javascript"></script>
+</head>
+<body>
+<div class="slide titlepage">
+  <h1 class="title">Introduction to parallel computing with R</h1>
+  <p class="author">
+Formation R avancé. INRA.
+  </p>
+  <p class="date">Formation R avancé <br> <img src="CC-BY-SA.png" alt="ccby" /></p>
+</div>
+<div class="slide section level2">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('slides').prepend("<div class=\"zoomDiv\"><img src=\"\" class=\"zoomImg\"></div>");
+    // onClick function for all plots (img's)
+    $('img:not(.zoomImg)').click(function() {
+      $('.zoomImg').attr('src', $(this).attr('src'));
+      $('.zoomDiv').css({opacity: '1', width: '75%'});
+    });
+    // onClick function for zoomImg
+    $('img.zoomImg').click(function() {
+      $('.zoomDiv').css({opacity: '0', width: '0%'});
+    });0
+  });
+</script>
+</div>
+<div id="introduction" class="titleslide slide section level1"><h1>Introduction</h1></div><div id="serial-computation" class="slide section level2">
+<h2>Serial computation</h2>
+<ul>
+<li><p>Traditionally, software has been written for serial computation</p>
+<ul>
+<li>A problem is broken into a <strong>discrete series</strong> of instructions</li>
+<li>Instructions are executed <strong>sequentially</strong> one after another on a <strong>single processor</strong></li>
+<li>Only one instruction may execute at any moment in time</li>
+</ul></li>
+</ul>
+
+<!-- ![Serial computing](serialProblem.gif) -->
+</div><div id="parallel-computing" class="slide section level2">
+<h2>Parallel computing</h2>
+<ul>
+<li><p>Parallel computing is the <strong>simultaneous use</strong> of <strong>multiple compute resources</strong> to solve a computational problem</p>
+<ul>
+<li>A problem is broken into <strong>discrete parts</strong> that can be <strong>solved concurrently</strong></li>
+<li>Each part is further broken down to a series of instructions which <strong>execute simultaneously</strong> on <strong>different processors</strong></li>
+<li>An <strong>overall control/coordination</strong> mechanism is employed 
+</li>
+</ul></li>
+</ul>
+</div><div id="motivation-for-parallel-computing" class="slide section level2">
+<h2>Motivation for parallel computing</h2>
+<ul>
+<li>Consider the case when you need to <strong>repeat</strong> a computation, or a series of computations, <strong>many (many) times</strong>, or/and when those individual computations are <strong>time-consuming</strong>, e.g.:
+<ul>
+<li>Running a simulation model using multiple different parameter sets,</li>
+<li>Running multiple MCMC chains simultaneously,</li>
+<li>Carrying out bootstrapping, cross-validation, etc.</li>
+</ul>
+<p><strong>It takes time...</strong></p></li>
+<li><p>Nowadays (almost) all computers have <strong>multicore processors</strong></p></li>
+<li><p>As long as the computations do not need to communicate, they can be <strong>spread across multiple cores</strong> and <strong>executed in parallel</strong>, thus <strong>reducing computation time</strong></p></li>
+</ul>
+</div>
+<div id="parallel-computing-in-r" class="titleslide slide section level1"><h1>Parallel computing in R</h1></div><div id="parallel-computing-in-r-1" class="slide section level2">
+<h2>Parallel computing in R</h2>
+<ul>
+<li>The package <strong><code>parallel</code></strong>
+<ul>
+<li>The <strong>foundational package</strong> for parallel computing in R</li>
+<li>Comes pre-installed with base R in recent R versions (since R 2.14.0)</li>
+<li>Builds on <code>multicore</code> (works for unix-alikes) &amp; <code>snow</code> (works for Winblows)</li>
+<li>Provides <strong>parallel <code>apply</code></strong> functions</li>
+</ul></li>
+<li><p>The package <strong><code>doParallel</code></strong> is a parallel backend for the <strong><code>foreach</code></strong> package which enable the execution of <strong><code>for</code> loops</strong> in parallel</p></li>
+<li><p>Some <strong>task specific packages</strong> include an option for parallel computation: e.g. <code>boot</code>, <code>caret</code>, <code>pls</code>, <code>plyr</code></p></li>
+</ul>
+</div><div id="how-many-cores-do-you-have-on-your-computer" class="slide section level2">
+<h2>How many cores do you have on your computer?</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(parallel)
+<span class="kw">detectCores</span>()</code></pre></div>
+<pre><code>## [1] 8</code></pre>
+</div><div id="create-a-parallel-backend" class="slide section level2">
+<h2>Create a parallel backend</h2>
+<p>You need to create a cluster with desired number of cores</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">2</span>)</code></pre></div>
+</div><div id="execute-computation-in-parallel-using-parallel-apply-functions" class="slide section level2">
+<h2>Execute computation in parallel using parallel <code>apply</code> functions</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">parLapply</span>(cl, X, FUN, ...)
+<span class="kw">parSapply</span>(cl, X, FUN, ...)
+<span class="kw">parApply</span>(cl, X, MARGIN, FUN, ...)</code></pre></div>
+</div><div id="execute-computation-in-parallel-using-foreach" class="slide section level2">
+<h2>Execute computation in parallel using <code>foreach</code></h2>
+<p>Don't forget to:</p>
+<pre><code>* load the `doParallel` package
+* register your cluster before the computations</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(doParallel)
+<span class="kw">registerDoParallel</span>(cl)
+x &lt;-<span class="st"> </span><span class="kw">foreach</span>(..., .combine) <span class="op">%dopar%</span><span class="st"> </span>{
+}</code></pre></div>
+</div><div id="stop-your-cluster" class="slide section level2">
+<h2>Stop your cluster</h2>
+<p>In any case don't forget to stop your cluster when you're done</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">stopCluster</span>(cl)</code></pre></div>
+</div>
+<div id="exercises" class="titleslide slide section level1"><h1>Exercises</h1></div><div id="exercise-1-column-means-of-a-large-matrix" class="slide section level2">
+<h2>Exercise 1 Column means of a large matrix</h2>
+<p>Consider a matrix of 10 rows <span class="math inline">×</span> 1 million columns with normally distributed data of mean 0 and variance 1</p>
+<ul>
+<li>Generate this matrix</li>
+<li>Compute the column means using <code>apply</code>, <code>parApply</code> and <code>colMeans</code></li>
+<li>Record and compare the computation times</li>
+</ul>
+</div><div id="one-solution" class="slide section level2">
+<h2>One solution</h2>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">mymat &lt;-<span class="st"> </span><span class="kw">matrix</span>(<span class="kw">rnorm</span>(<span class="dv">10</span><span class="op">*</span><span class="dv">1000000</span>), <span class="dt">nrow =</span> <span class="dv">10</span>, <span class="dt">ncol =</span> <span class="dv">1000000</span>)
+<span class="kw">system.time</span>(out &lt;-<span class="st"> </span><span class="kw">apply</span>(mymat, <span class="dv">2</span>, mean))</code></pre></div>
+<pre><code>##    user  system elapsed 
+##   4.844   0.004   4.847</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(parallel)
+cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">4</span>)
+<span class="kw">system.time</span>(out &lt;-<span class="st"> </span><span class="kw">parApply</span>(cl, mymat, <span class="dv">2</span>, mean))</code></pre></div>
+<pre><code>##    user  system elapsed 
+##   2.632   0.076   4.279</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">system.time</span>(out &lt;-<span class="st"> </span><span class="kw">colMeans</span>(mymat))</code></pre></div>
+<pre><code>##    user  system elapsed 
+##   0.012   0.000   0.010</code></pre>
+</div><div id="exercise-2-bootstrap-confidence-interval-of-a-regression-slope" class="slide section level2">
+<h2>Exercise 2 Bootstrap confidence interval of a regression slope</h2>
+<p>You're interested in computing a 95% confidence interval of the slope of the following regression</p>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">x &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dt">n =</span> <span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">0</span>, <span class="dt">sd =</span> <span class="dv">1</span>)
+y &lt;-<span class="st"> </span><span class="kw">rnorm</span>(<span class="dt">n =</span> <span class="dv">1000</span>, <span class="dt">mean =</span> <span class="dv">1</span> <span class="op">+</span><span class="st"> </span><span class="dv">2</span> <span class="op">*</span><span class="st"> </span>x, <span class="dt">sd =</span> <span class="dv">2</span>)
+mydata &lt;-<span class="st"> </span><span class="kw">data.frame</span>(x, y)
+myreg &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data =</span> mydata)</code></pre></div>
+</div><div id="exercise-2-bootstrap-confidence-interval-of-a-regression-slope-1" class="slide section level2">
+<h2>Exercise 2 Bootstrap confidence interval of a regression slope</h2>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">par</span>(<span class="dt">mar =</span> <span class="kw">c</span>(<span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">4</span>, <span class="dv">1</span>), <span class="dt">cex =</span> <span class="fl">0.7</span>)
+<span class="kw">plot</span>(mydata, <span class="dt">pch =</span> <span class="dv">21</span>, <span class="dt">bg =</span> <span class="st">&quot;grey&quot;</span>,
+     <span class="dt">main =</span> <span class="kw">paste</span>(<span class="st">&quot;slope = &quot;</span>, <span class="kw">round</span>(myreg<span class="op">$</span>coef[<span class="dv">2</span>], <span class="dv">2</span>)))
+<span class="kw">abline</span>(myreg)</code></pre></div>
+<div class="figure">
+<img src="figure/unnamed-chunk-8-1.png" alt="plot of chunk unnamed-chunk-8" />
+<p class="caption">plot of chunk unnamed-chunk-8</p>
+</div>
+</div><div id="exercise-2-bootstrap-confidence-interval-of-a-regression-slope-2" class="slide section level2">
+<h2>Exercise 2 Bootstrap confidence interval of a regression slope</h2>
+<ul>
+<li><p>Reproduce the dataset, the regression and the graph</p></li>
+<li><p>Generate 1000 boostrap samples (function <code>sample()</code>)</p></li>
+<li><p>Compute the regression slope within each bootsrap sample</p></li>
+<li><p>Use the <code>quantile()</code> function to get a 95% confidence interval</p></li>
+<li><p>Do the analysis both in serial and parallel</p></li>
+<li><p>Record and compare the computation times</p></li>
+</ul>
+</div><div id="for-loop-solution" class="slide section level2">
+<h2><code>for</code> loop solution</h2>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">proc.time</span>()
+boot_a &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="ot">NA</span>, <span class="dv">1000</span>)
+<span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>) {
+  bootstrap_data &lt;-<span class="st"> </span>mydata[<span class="kw">sample</span>(<span class="kw">nrow</span>(mydata), <span class="kw">nrow</span>(mydata),
+                                  <span class="dt">replace=</span><span class="ot">TRUE</span>), ]
+  boot_a[i] &lt;-<span class="st"> </span><span class="kw">unname</span>(<span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x,bootstrap_data)<span class="op">$</span>coef[<span class="dv">2</span>])
+}
+<span class="kw">c</span>(<span class="kw">quantile</span>(boot_a, <span class="kw">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)))</code></pre></div>
+<pre><code>##   2.5%  97.5% 
+## 1.9238 2.1687</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">proc.time</span>() <span class="op">-</span><span class="st"> </span>a</code></pre></div>
+<pre><code>##    user  system elapsed 
+##   1.336   0.000   1.335</code></pre>
+</div><div id="foreach-loop-solution" class="slide section level2">
+<h2><code>foreach</code> loop solution</h2>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(doParallel)</code></pre></div>
+<pre><code>## Error in library(doParallel): there is no package called &#39;doParallel&#39;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">4</span>)
+<span class="kw">registerDoParallel</span>(<span class="dt">cl =</span> cl)</code></pre></div>
+<pre><code>## Error in eval(expr, envir, enclos): could not find function &quot;registerDoParallel&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">proc.time</span>()
+boot_b &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">i =</span> <span class="dv">1</span><span class="op">:</span><span class="dv">1000</span>, <span class="dt">.combine=</span>c) <span class="op">%dopar%</span><span class="st"> </span>{
+  bootstrap_data &lt;-<span class="st"> </span>mydata[<span class="kw">sample</span>(<span class="kw">nrow</span>(mydata), <span class="kw">nrow</span>(mydata),
+                                  <span class="dt">replace=</span><span class="ot">TRUE</span>), ]
+  <span class="kw">unname</span>(<span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x, bootstrap_data)<span class="op">$</span>coef[<span class="dv">2</span>])
+}</code></pre></div>
+<pre><code>## Error in eval(expr, envir, enclos): could not find function &quot;%dopar%&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">stopCluster</span>(cl)
+<span class="kw">c</span>(<span class="kw">quantile</span>(boot_b, <span class="kw">c</span>(<span class="fl">0.025</span>, <span class="fl">0.975</span>)))</code></pre></div>
+<pre><code>## Error in quantile(boot_b, c(0.025, 0.975)): object &#39;boot_b&#39; not found</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">proc.time</span>() <span class="op">-</span><span class="st"> </span>a</code></pre></div>
+<pre><code>##    user  system elapsed 
+##   0.004   0.000   0.005</code></pre>
+</div><div id="boot-solution" class="slide section level2">
+<h2><code>boot</code> solution</h2>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(boot)
+a &lt;-<span class="st"> </span><span class="kw">proc.time</span>()
+get.slope.reg &lt;-<span class="st"> </span><span class="cf">function</span>(formula, data, indices){
+  d &lt;-<span class="st"> </span>data[indices,]
+  <span class="kw">unname</span>(<span class="kw">lm</span>(formula, d)<span class="op">$</span>coef[<span class="dv">2</span>])
+}
+boot_c &lt;-<span class="st"> </span><span class="kw">boot</span>(<span class="dt">data =</span> mydata, <span class="dt">statistic =</span> get.slope.reg, <span class="dt">R =</span> <span class="dv">1000</span>,
+               <span class="dt">formula =</span> y <span class="op">~</span><span class="st"> </span>x, <span class="dt">parallel =</span>  <span class="st">&quot;multicore&quot;</span>, <span class="dt">ncpus =</span> <span class="dv">4</span>)
+<span class="kw">proc.time</span>()<span class="op">-</span>a</code></pre></div>
+<pre><code>##    user  system elapsed 
+##   1.648   0.412   0.558</code></pre>
+</div><div id="boot-solution-1" class="slide section level2">
+<h2><code>boot</code> solution</h2>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">boot.ci</span>(boot_c, <span class="dt">type =</span> <span class="st">&quot;perc&quot;</span>)</code></pre></div>
+<pre><code>## BOOTSTRAP CONFIDENCE INTERVAL CALCULATIONS
+## Based on 1000 bootstrap replicates
+## 
+## CALL : 
+## boot.ci(boot.out = boot_c, type = &quot;perc&quot;)
+## 
+## Intervals : 
+## Level     Percentile     
+## 95%   ( 1.925,  2.166 )  
+## Calculations and Intervals on Original Scale</code></pre>
+</div><div id="exercise-3-predicted-residual-sum-of-squares-press" class="slide section level2">
+<h2>Exercise 3 Predicted Residual Sum of Squares (PRESS)</h2>
+<p>The PRESS is a statistic used to assess the predictive ability of a model : <span class="math inline">$\operatorname{PRESS} =\sum_{i=1}^n (y_i - \hat{y}_{i, -i})^2$</span> (Allen, 1971)</p>
+<p><span class="math inline">⇔</span> the prediction residual sum of squares within a leave-one-out cross-validation.</p>
+<ul>
+<li><p>Consider the regression from exercise 2, can you compute it's PRESS?</p></li>
+<li><p>Use both <code>for</code> and <code>foreach</code> loops for the computations and compare the corresponding execution times</p></li>
+<li><p>How fast is your code in comparison to the function <code>PRESS</code> of the <code>MPV</code> library?</p></li>
+</ul>
+</div><div id="for-loop-solution-1" class="slide section level2">
+<h2><code>for</code> loop solution</h2>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">proc.time</span>()
+pred &lt;-<span class="st"> </span><span class="kw">rep</span>(<span class="ot">NA</span>, <span class="kw">nrow</span>(mydata))
+<span class="cf">for</span> (i <span class="cf">in</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(mydata)){
+  dat &lt;-<span class="st"> </span>mydata[<span class="op">-</span><span class="st"> </span>i, ]
+  mod &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data =</span> dat)
+  pred[i] &lt;-<span class="st"> </span><span class="kw">predict</span>(<span class="dt">object =</span> mod, mydata[i, ])
+}</code></pre></div>
+<pre><code>## Warning: closing unused connection 8 (&lt;-localhost:11253)</code></pre>
+<pre><code>## Warning: closing unused connection 7 (&lt;-localhost:11253)</code></pre>
+<pre><code>## Warning: closing unused connection 6 (&lt;-localhost:11253)</code></pre>
+<pre><code>## Warning: closing unused connection 5 (&lt;-localhost:11253)</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">sum</span>((pred <span class="op">-</span><span class="st"> </span>mydata<span class="op">$</span>y)<span class="op">^</span><span class="dv">2</span>)</code></pre></div>
+<pre><code>## [1] 3849.3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">proc.time</span>() <span class="op">-</span><span class="st"> </span>a</code></pre></div>
+<pre><code>##    user  system elapsed 
+##   1.764   0.000   1.764</code></pre>
+</div><div id="foreach-loop-solution-1" class="slide section level2">
+<h2><code>foreach</code> loop solution</h2>
+
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(doParallel)</code></pre></div>
+<pre><code>## Error in library(doParallel): there is no package called &#39;doParallel&#39;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">cl &lt;-<span class="st"> </span><span class="kw">makeCluster</span>(<span class="dv">4</span>)
+<span class="kw">registerDoParallel</span>(<span class="dt">cl =</span> cl)</code></pre></div>
+<pre><code>## Error in eval(expr, envir, enclos): could not find function &quot;registerDoParallel&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">proc.time</span>()
+pred &lt;-<span class="st"> </span><span class="kw">foreach</span>(<span class="dt">i =</span> <span class="dv">1</span><span class="op">:</span><span class="kw">nrow</span>(mydata), <span class="dt">.combine =</span> c) <span class="op">%dopar%</span><span class="st"> </span>{
+  dat &lt;-<span class="st"> </span>mydata[<span class="op">-</span><span class="st"> </span>i, ]
+  mod &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data =</span> dat)
+  <span class="kw">predict</span>(<span class="dt">object =</span> mod, mydata[i, ])
+}</code></pre></div>
+<pre><code>## Error in eval(expr, envir, enclos): could not find function &quot;%dopar%&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">stopCluster</span>(cl)
+<span class="kw">sum</span>((pred <span class="op">-</span><span class="st"> </span>mydata<span class="op">$</span>y)<span class="op">^</span><span class="dv">2</span>)</code></pre></div>
+<pre><code>## [1] 3849.3</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">proc.time</span>() <span class="op">-</span><span class="st"> </span>a</code></pre></div>
+<pre><code>##    user  system elapsed 
+##   0.004   0.000   0.004</code></pre>
+</div><div id="press-function-from-mpv-package" class="slide section level2">
+<h2><code>PRESS</code> function from <code>MPV</code> package</h2>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(MPV)</code></pre></div>
+<pre><code>## Error in library(MPV): there is no package called &#39;MPV&#39;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">a &lt;-<span class="st"> </span><span class="kw">proc.time</span>()
+myreg &lt;-<span class="st"> </span><span class="kw">lm</span>(y <span class="op">~</span><span class="st"> </span>x, <span class="dt">data =</span> mydata)
+<span class="kw">PRESS</span>(myreg)</code></pre></div>
+<pre><code>## Error in eval(expr, envir, enclos): could not find function &quot;PRESS&quot;</code></pre>
+<div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r"><span class="kw">proc.time</span>() <span class="op">-</span><span class="st"> </span>a</code></pre></div>
+<pre><code>##    user  system elapsed 
+##   0.004   0.000   0.003</code></pre>
+</div>
+<div id="references" class="titleslide slide section level1"><h1>References</h1></div><div class="slide section level2">
+
+
+<ul>
+<li><p><strong>Blaise Barney</strong>. <em>Introduction to Parallel Computing</em> (2016). https://computing.llnl.gov/tutorials/parallel_comp/</p></li>
+<li><p><strong>Clint Leach</strong>. <em>Introduction to parallel computing in R</em> (2014). http://michaeljkoontz.weebly.com/uploads/1/9/9/4/19940979/parallel.pdf</p></li>
+<li><p><strong>Steve Weston &amp; Rich Calaway</strong>. <em>Getting Started with doParallel and foreach</em> (2015). https://cran.r-project.org/web/packages/doParallel/vignettes/gettingstartedParallel.pdf</p></li>
+<li><p><strong>Dirk Eddelbuettel</strong>. <em>CRAN Task View: High-Performance and Parallel Computing with R</em> (2016). https://cran.r-project.org/web/views/HighPerformanceComputing.html</p></li>
+<li><p><strong>Roger D Peng</strong>. <em>R Programming for Data Science</em> (2016). https://bookdown.org/rdpeng/rprogdatascience/</p></li>
+<li><p><strong>Colin Gillespie &amp; Robin Lovelace</strong>. <em>Efficient R programming</em> (2016). https://bookdown.org/csgillespie/efficientR/</p></li>
+</ul>
+</div>
+</body>
+</html>
